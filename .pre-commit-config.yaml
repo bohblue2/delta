@@ -1,0 +1,66 @@
+repos:
+  ##############################################################################
+  #  General checks
+  ##############################################################################
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: forbid-new-submodules
+      - id: fix-encoding-pragma
+        args: [--remove]
+      - id: end-of-file-fixer
+        types_or: [python, cython, rust]
+      - id: trailing-whitespace
+        types_or: [rust, cython, python]
+      - id: debug-statements
+      - id: detect-private-key
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-executables-have-shebangs
+      - id: check-json
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-xml
+      - id: check-yaml
+
+  - repo: https://github.com/codespell-project/codespell
+    rev: v2.2.5
+    hooks:
+      - id: codespell
+        description: Checks for common misspellings.
+        types_or: [python, cython, rst, markdown]
+        args: ["-L", "ot,zar"]
+
+  ##############################################################################
+  #  Python/Cython formatting and linting
+  ##############################################################################
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+      - id: add-trailing-comma
+        name: add-trailing-comma
+        types: [python]
+
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+        types_or: [python, pyi]
+        entry: "black"
+        args: ["--config", "pyproject.toml"]
+
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.0.287
+    hooks:
+      - id: ruff
+        args: ["--fix"]
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort (cython)
+        types_or: [cython]
+        entry: "isort"
+        args: ["--settings-file", "pyproject.toml"]
