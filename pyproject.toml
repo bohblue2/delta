@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "delta"
+version = "0.1.0"
+description = "Data-driven Evaluation and Live Trading Algorithm"
+authors = ["BrianBae <bohblue23@gmail.com>"]
+license = "Apache License 2.0"
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+ruff = "^0.0.287"
+black = "^23.9.0"
+pre-commit = "^3.4.0"
+isort = "^5.12.0"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
