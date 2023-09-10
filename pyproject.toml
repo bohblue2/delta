@@ -24,7 +24,7 @@ isort = "^5.12.0"
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
-[codespell]
+[tool.codespell]
 skip = "./legacy,./delta/inblock.py"
 
 [tool.ruff]
