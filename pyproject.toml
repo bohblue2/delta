@@ -25,7 +25,7 @@ requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
 [tool.codespell]
-skip = "./legacy,./delta/inblock.py"
+exclude-file = "delta/inblock.py"
 
 [tool.ruff]
 line-length = 120
