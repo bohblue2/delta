@@ -161,3 +161,9 @@ cython_debug/
 
 # Ruff project settings
 .ruff_cache/
+
+# Ebest api cache files
+.scripts/res
+
+# legacy project
+.legacy/
