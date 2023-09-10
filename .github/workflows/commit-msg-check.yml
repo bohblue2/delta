@@ -13,7 +13,7 @@ jobs:
       - name: Read Commit Regular Expression
         id: read_commit_regex
         run: |
-          commit_msg_regex=$(cat ./.github/commit-regular.txt)
+          commit_msg_regex=$(cat ./.github/commit-msg-regex.txt)
           echo "Commit Regular Expression: $commit_msg_regex"
           echo "::set-output name=commit_regex::$commit_msg_regex"
 
