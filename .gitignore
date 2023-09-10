@@ -164,6 +164,7 @@ cython_debug/
 
 # Ebest api cache files
 *.res
+scripts/res
 
 # legacy project
 .legacy/
