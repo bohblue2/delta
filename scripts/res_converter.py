@@ -217,8 +217,8 @@ from pydantic import Field, BaseModel
                     )
         statement += (
             " " * 4
-            + f"metadata: dict = Field(description='The metadata information for {res['header']['tr_code']}',\
-             default_factory=lambda : dict())\n"
+            + f"metadata: dict = Field(description='The metadata information for {res['header']['tr_code']}', \
+default_factory=lambda : dict())\n"
         )
         statement += "# endregion\n"
         statement += "\n"
