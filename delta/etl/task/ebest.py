@@ -1,10 +1,11 @@
+import os
 from time import sleep
 from urllib.parse import urljoin
 
 import pandas as pd
 from prefect import task
 
-from delta.config import EBEST_REST_URL
+from delta.config import EBEST_REST_URL, DELTA_DB_PATH
 
 
 def get_data(client, headers, base_url, path, tr_code, inblock):
@@ -19,7 +20,14 @@ def get_data(client, headers, base_url, path, tr_code, inblock):
 
 
 @task(timeout_seconds=60, log_prints=True)
-def update_data(client, headers, date, data_config, delay_sec=0.5):
+def update_data(
+    client,
+    headers,
+    date,
+    data_config,
+    delay_sec=0.5,
+    db_path=DELTA_DB_PATH,
+):
     for config in data_config:
         df = get_data(
             client,
@@ -29,5 +37,8 @@ def update_data(client, headers, date, data_config, delay_sec=0.5):
             tr_code=config["tr_code"],
             inblock=config["inblock"],
         )
-        df.to_csv(f"~/deltadb/{date}/{config['filename']}.csv", index=False)
+        df.to_csv(
+            os.path.join(db_path, date, f"{config['filename']}.csv"),
+            index=False,
+        )
         sleep(delay_sec)

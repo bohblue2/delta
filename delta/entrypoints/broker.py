@@ -13,10 +13,11 @@ from delta.config import (
     DELTA_BROKER_CRYPTO_SUB_URL,
     DELTA_VERBOSE,
     DELTA_ZMQ_TIMEOUT,
+    DELTA_DB_PATH,
 )
 
 
-def configure_logger(task_name, date, path="~/deltadb/"):
+def configure_logger(task_name, date, path):
     logger.add(
         os.path.join(path, date, f"logs/{task_name}_ticks.log"),
         format="{message}",
@@ -27,8 +28,8 @@ def configure_logger(task_name, date, path="~/deltadb/"):
     return logger.bind(task=task_name)
 
 
-def create_logger_config(task_names, date):
-    return {task: configure_logger(task, date) for task in task_names}
+def create_logger_config(task_names, date, path):
+    return {task: configure_logger(task, date, path) for task in task_names}
 
 
 def create_client(config, context):
@@ -75,7 +76,7 @@ def main():
 
     config = create_config()
     date = datetime.now().strftime("%Y%m%d")
-    loggers = create_logger_config(["ebest", "crypto"], date)
+    loggers = create_logger_config(["ebest", "crypto"], date, path=DELTA_DB_PATH)
 
     context = zmq.Context()
     stock_client = create_client(config["ebest_config"], context)

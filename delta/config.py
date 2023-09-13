@@ -14,6 +14,7 @@ EBEST_WS_URL = os.environ.get("EBEST_WS_URL", "wss://openapi.ebestsec.co.kr:2944
 
 DELTA_VERBOSE = os.environ.get("DELTA_VERBOSE", "False").lower() == "true"
 DELTA_ZMQ_TIMEOUT = int(os.environ.get("DELTA_ZMQ_TIMEOUT", "600"))
+DELTA_DB_PATH = os.environ.get("DELTA_DB_PATH", "~/deltadb")
 DELTA_FEEDER_PUB_URL = os.environ.get(
     "DELTA_FEEDER_PUB_URL",
     "ipc:///tmp/dev_ebest_feeder_pub.ipc",
