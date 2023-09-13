@@ -14,7 +14,7 @@ from delta.config import (
     EBEST_APP_KEY,
     EBEST_APP_SECRET,
     EBEST_WS_URL,
-    ZMQ_PUB_URL,
+    DELTA_FEEDER_PUB_URL,
 )
 from delta.network.zmq import ZmqPublisher
 
@@ -106,11 +106,11 @@ async def handle_msg(msg, publisher):
 async def start_client(sess, access_token, topics, url="/websocket"):
     header = {"header": {"token": access_token, "tr_type": "3"}}
     body = {"body": {"tr_cd": None, "tr_key": None}}
-    publisher = ZmqPublisher(endpoint=ZMQ_PUB_URL)
+    publisher = ZmqPublisher(endpoint=DELTA_FEEDER_PUB_URL)
     try:
         async with sess.ws_connect(url) as ws:
             asyncio.create_task(send_ping(ws, 5))
-            await subscribe_to_topics(ws, header, body, topics)
+            await subscribe_to_topics(ws, header, body, topics[:20])
             await listen_for_messages(ws, publisher)
     except Exception as e:
         raise e

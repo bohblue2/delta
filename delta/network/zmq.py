@@ -11,8 +11,8 @@ class ZmqPublisher(BaseNetworkPublisher):
         self._socket = zmq_ctx.socket(zmq.PUB)
         self._socket.connect(self._endpoint)
 
-    async def publish(self, topic: str, msg: str, encoding="utf-8"):
-        await self._socket.send_multipart([topic.encode(encoding), msg])
+    async def publish(self, topic: str, msg: bytes, encoding="utf-8", sep=b" "):
+        await self._socket.send(topic.encode(encoding) + sep + msg)
 
     def __del__(self):
         self._socket.close()
