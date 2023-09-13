@@ -4,7 +4,7 @@ Data-driven Evaluation and Live Trading Algorithm
 # ETL Process configuration Guide
 1. Create Deployment configuration file
 ```bash
-prefect deploy delta/etl/flow/ebest.py:main
+prefect deploy delta/etl/flow/update_master.py:main
 ```
 
 2. deploy using this deployment configuration with command:

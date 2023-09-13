@@ -24,7 +24,7 @@ deployments:
   version:
   tags: []
   description:
-  entrypoint: delta/etl/flow/ebest.py:main
+  entrypoint: delta/etl/flow/update_master.py:main
   parameters: {}
   work_pool:
     name: delta-process-pool
