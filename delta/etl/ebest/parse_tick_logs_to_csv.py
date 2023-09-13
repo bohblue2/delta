@@ -27,6 +27,8 @@ def parse_lines(lines):
 
 
 def save_to_csv(table, date):
+    os.makedirs(os.path.join(DELTA_DB_PATH, date, "ticks"), exist_ok=True)
+
     for key, rows in table.items():
         df = pd.DataFrame(rows)
         path = os.path.join(DELTA_DB_PATH, date, "ticks", f"{key}.csv")
