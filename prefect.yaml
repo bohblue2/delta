@@ -1,0 +1,36 @@
+# Welcome to your prefect.yaml file! You can use this file for storing and managing
+# configuration for deploying your flows. We recommend committing this file to source
+# control along with your flow code.
+
+# Generic metadata about this project
+name: delta
+prefect-version: 2.13.0
+
+# build section allows you to manage and build docker images
+build:
+
+# push section allows you to manage if and how this project is uploaded to remote locations
+push:
+
+# pull section allows you to provide instructions for cloning this project in remote locations
+pull:
+- prefect.deployments.steps.git_clone:
+    repository: https://github.com/bohblue2/delta
+    branch: main
+
+# the deployments section allows you to provide configuration for deploying flows
+deployments:
+- name: daily
+  version:
+  tags: []
+  description:
+  entrypoint: delta/etl/flow/ebest.py:main
+  parameters: {}
+  work_pool:
+    name: delta-process-pool
+    work_queue_name:
+    job_variables: {}
+  schedule:
+    cron: 20 22 * * *
+    timezone: UTC
+    day_or: true
