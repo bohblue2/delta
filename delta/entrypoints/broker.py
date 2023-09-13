@@ -1,7 +1,6 @@
 from datetime import datetime
-
-import zmq
 import os
+import zmq
 from loguru import logger
 
 from delta.broker import ZmqClient, ZmqBroker
@@ -28,6 +27,10 @@ def configure_logger(task_name, date, path="./delta/"):
     return logger.bind(task=task_name)
 
 
+def create_logger_config(task_names, date):
+    return {task: configure_logger(task, date) for task in task_names}
+
+
 def create_client(config, context):
     return ZmqClient(
         internal_publisher_url=config["internal_publisher"],
@@ -38,8 +41,8 @@ def create_client(config, context):
     )
 
 
-def main():
-    config = {
+def create_config():
+    return {
         "ebest_config": {
             "name": "ebest",
             "internal_publisher": DELTA_BROKER_EBEST_INTERNAL_PUB_URL,
@@ -55,22 +58,8 @@ def main():
         "zmq_timeout": DELTA_ZMQ_TIMEOUT,
     }
 
-    if not DELTA_VERBOSE:
-        logger.remove()  # disable printing log into stdout.
 
-    date = datetime.now().strftime("%Y%m%d")
-    logger_stock = configure_logger("ebest", date)
-    logger_crypto = configure_logger("crypto", date)
-
-    context = zmq.Context()
-    stock_client = create_client(config["ebest_config"], context)
-    crypto_client = create_client(config["crypto_config"], context)
-
-    clients = [stock_client, crypto_client]
-    broker = ZmqBroker(clients, config["zmq_timeout"])
-    broker.add_handler(stock_client, logger_stock.info)
-    broker.add_handler(crypto_client, logger_crypto.info)
-
+def run_broker(clients, broker):
     try:
         while True:
             broker.proxy()
@@ -79,6 +68,26 @@ def main():
     finally:
         for client in clients:
             client.close()
+
+
+def main():
+    if not DELTA_VERBOSE:
+        logger.remove()  # Disable printing log into stdout.
+
+    config = create_config()
+    date = datetime.now().strftime("%Y%m%d")
+    loggers = create_logger_config(["ebest", "crypto"], date)
+
+    context = zmq.Context()
+    stock_client = create_client(config["ebest_config"], context)
+    crypto_client = create_client(config["crypto_config"], context)
+
+    clients = [stock_client, crypto_client]
+    broker = ZmqBroker(clients, config["zmq_timeout"])
+    broker.add_handler(stock_client, loggers["ebest"].info)
+    broker.add_handler(crypto_client, loggers["crypto"].info)
+
+    run_broker(clients, broker)
 
 
 if __name__ == "__main__":
