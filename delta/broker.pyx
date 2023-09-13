@@ -1,7 +1,9 @@
+from typing import Callable, Dict
+
 import zmq
 
 
-cdef class ZeromqClient:
+cdef class ZmqClient:
     cdef str _name
     cdef object _context
     cdef object _subscriber
@@ -15,7 +17,7 @@ cdef class ZeromqClient:
             external_publisher_url: str,
             high_water_mark: int = 10**5,
             name: str = 'default',
-            context: object = zmq.Context(),
+            context: zmq.Context = zmq.Context(),
     ):
         self._name = name
         self._context = context
@@ -60,13 +62,13 @@ cdef class ZmqBroker:
 
     def __init__(
             self,
-            clients: list[ZeromqClient],
+            clients: list[ZmqClient],
             timeout: int
     ):
         self._clients = clients
         self._timeout = timeout
 
-        self._handlers = {}
+        self._handlers: Dict[ZmqClient, Callable] = {}
         self._poller = zmq.Poller()
         for client in clients:
             self._poller.register(
@@ -85,9 +87,9 @@ cdef class ZmqBroker:
                 raw_msg = client.subscribe()
                 client.publish(raw_msg)
                 if client in self._handlers:
-                    handler = self._handlers[client]
+                    handler: Callable = self._handlers[client]
                     handler(raw_msg)
                 return raw_msg
 
-    cpdef void add_handler(self, client: ZeromqClient, handler: callable):
+    cpdef void add_handler(self, client: ZmqClient, handler: Callable):
         self._handlers[client] = handler
