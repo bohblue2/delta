@@ -64,7 +64,7 @@ def update_data(
 @flow(name="Update EBest Master")
 def main():
     date = datetime.now().strftime("%Y%m%d")
-    os.makedirs(f"~/deltadb/{date}", exist_ok=True)
+    os.makedirs(os.path.join(DELTA_DB_PATH, date), exist_ok=True)
 
     data_config_code = [
         {
