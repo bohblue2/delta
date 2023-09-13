@@ -65,7 +65,6 @@ def run_broker(clients, broker):
             broker.proxy()
     except KeyboardInterrupt:
         print("Closing.")
-    finally:
         for client in clients:
             client.close()
 

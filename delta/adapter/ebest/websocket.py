@@ -110,7 +110,7 @@ async def start_client(sess, access_token, topics, url="/websocket"):
     try:
         async with sess.ws_connect(url) as ws:
             asyncio.create_task(send_ping(ws, 5))
-            await subscribe_to_topics(ws, header, body, topics)
+            await subscribe_to_topics(ws, header, body, topics[:20])
             await listen_for_messages(ws, publisher)
     except Exception as e:
         raise e

@@ -50,7 +50,6 @@ cdef class ZmqClient:
         self._internal_publisher.close()
         self._external_publisher.close()
         self._subscriber.close()
-        self._context.term()
 
 cdef class ZmqBroker:
     cdef list _clients
