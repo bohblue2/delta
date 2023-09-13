@@ -62,18 +62,17 @@ async def send_ping(ws, delay):
 async def subscribe_to_topics(ws, header, body, topics, delay_sec=0.05):
     """Subscribe to topics through the websocket."""
     for topic in tqdm(topics):
-        for topic in tqdm(topics):
-            body["body"]["tr_cd"] = topic[0]
-            body["body"]["tr_key"] = topic[1]
-            await ws.send_str(json.dumps({**header, **body}).decode("utf-8"))
-            msg = await ws.receive()
-            if msg.type == WSMsgType.TEXT:
-                data = json.loads(msg.data)
-                if not data["header"]["rsp_cd"] == "00000":
-                    raise Exception(
-                        f"Subscribe Error on ebest: {data['header']['rsp_msg']}",
-                    )
-            await asyncio.sleep(delay_sec)
+        body["body"]["tr_cd"] = topic[0]
+        body["body"]["tr_key"] = topic[1]
+        await ws.send_str(json.dumps({**header, **body}).decode("utf-8"))
+        msg = await ws.receive()
+        if msg.type == WSMsgType.TEXT:
+            data = json.loads(msg.data)
+            if "rsp_cd" in data["header"] and not data["header"]["rsp_cd"] == "00000":
+                raise Exception(
+                    f"Subscribe Error on ebest: {data['header']['rsp_msg']}",
+                )
+        await asyncio.sleep(delay_sec)
 
 
 async def listen_for_messages(ws, publisher):
@@ -84,18 +83,24 @@ async def listen_for_messages(ws, publisher):
             break
         elif msg.type == WSMsgType.PING:
             ws.pong()
-        else:
+        elif msg.type == WSMsgType.TEXT:
             await handle_msg(msg, publisher)
+        else:
+            raise Exception(f"Unexpected message type: {msg.type}")
 
 
 async def handle_msg(msg, publisher):
-    data = json.loads(msg)
-    data = {
-        **data["header"],
-        **data["body"],
-        "local_timestamp": datetime.now().timestamp(),
-    }
-    publisher.publish(topic=data["tr_cd"], msg=json.dumps(data))
+    data = json.loads(msg.data)
+    if "rsp_cd" not in data["header"]:
+        data = {
+            **data["header"],
+            **data["body"],
+            "local_timestamp": datetime.now().timestamp(),
+        }
+        await publisher.publish(
+            topic=f'{data["tr_cd"]} {data["tr_key"]}',
+            msg=json.dumps(data),
+        )
 
 
 async def start_client(sess, access_token, topics, url="/websocket"):
