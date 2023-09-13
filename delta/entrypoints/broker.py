@@ -16,7 +16,7 @@ from delta.config import (
 )
 
 
-def configure_logger(task_name, date, path="./delta/"):
+def configure_logger(task_name, date, path="~/deltadb/"):
     logger.add(
         os.path.join(path, date, f"logs/{task_name}_ticks.log"),
         format="{message}",
