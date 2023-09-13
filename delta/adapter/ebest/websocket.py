@@ -25,9 +25,9 @@ def create_topics(date):
     kosdaq_symbols = symbols[symbols["gubun"] == 2]["shcode"]
 
     kospi_tr_cd = [
-        # "DH1",  # after hour single price orderbook
-        # "DS3",  # after hour single price conclusion
-        # "H2_",  # after hour single price
+        "DH1",  # after hour single price orderbook
+        "DS3",  # after hour single price conclusion
+        "H2_",  # after hour single price
         "H1_",  # orderbook
         "S3_",  # conclusion
         "PH_",  # program
@@ -36,9 +36,9 @@ def create_topics(date):
     ]
 
     kosdaq_tr_cd = [
-        # "DHA",  # after hour single price orderbook
-        # "DK3",  # after hour single price conclusion
-        # "HB_",  # after hour orderbook
+        "DHA",  # after hour single price orderbook
+        "DK3",  # after hour single price conclusion
+        "HB_",  # after hour orderbook
         "HA_",  # orderbook
         "K3_",  # conclusion
         "KH_",  # program
@@ -110,7 +110,7 @@ async def start_client(sess, access_token, topics, url="/websocket"):
     try:
         async with sess.ws_connect(url) as ws:
             asyncio.create_task(send_ping(ws, 5))
-            await subscribe_to_topics(ws, header, body, topics[:20])
+            await subscribe_to_topics(ws, header, body, topics)
             await listen_for_messages(ws, publisher)
     except Exception as e:
         raise e
