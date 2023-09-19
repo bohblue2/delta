@@ -9,6 +9,7 @@ import orjson as json
 from tqdm import tqdm
 
 from delta.adapter.ebest.auth import get_access_token
+from delta.adapter.ebest.constant import SUBSCRIBE
 from delta.config import (
     EBEST_REST_URL,
     EBEST_APP_KEY,
@@ -104,7 +105,7 @@ async def handle_msg(msg, publisher):
 
 
 async def start_client(sess, access_token, topics, url="/websocket"):
-    header = {"header": {"token": access_token, "tr_type": "3"}}
+    header = {"header": {"token": access_token, "tr_type": SUBSCRIBE}}
     body = {"body": {"tr_cd": None, "tr_key": None}}
     publisher = ZmqPublisher(endpoint=DELTA_FEEDER_PUB_URL)
     try:

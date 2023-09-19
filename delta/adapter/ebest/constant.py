@@ -20,3 +20,5 @@ EXTENSION_QUERIES = [
     "t3320",  # FNG_요약
     "o3105",  # 해외선물 종목정보
 ]
+
+SUBSCRIBE = "3"
