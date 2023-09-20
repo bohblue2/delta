@@ -3,7 +3,7 @@ import os
 import zmq
 from loguru import logger
 
-from delta.broker import ZmqClient, ZmqBroker
+from delta.services.broker import ZmqClient, ZmqBroker
 from delta.config import (
     DELTA_BROKER_EBEST_INTERNAL_PUB_URL,
     DELTA_BROKER_EBEST_EXTERNAL_PUB_URL,
@@ -60,11 +60,11 @@ def create_config():
     }
 
 
-def run_broker(clients, broker):
+def start_broker(clients, broker):
     try:
         while True:
             broker.proxy()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:  # TODO: Use signal handler.
         print("Closing.")
         for client in clients:
             client.close()
@@ -87,8 +87,4 @@ def main():
     broker.add_handler(stock_client, loggers["ebest"].info)
     broker.add_handler(crypto_client, loggers["crypto"].info)
 
-    run_broker(clients, broker)
-
-
-if __name__ == "__main__":
-    main()
+    start_broker(clients, broker)

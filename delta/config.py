@@ -3,8 +3,8 @@ from os.path import join, dirname
 
 from dotenv import load_dotenv
 
-dotenv_filename = "dev.env" if os.getenv("ENV", "DEV") else "prod.env"
-dotenv_path = join(dirname(__file__), dotenv_filename)
+dotenv_filename = ".dev.env" if os.getenv("ENV", "DEV") else ".prod.env"
+dotenv_path = join("..", dirname(__file__), dotenv_filename)
 load_dotenv(dotenv_path)
 
 EBEST_APP_KEY = os.environ.get("EBEST_APP_KEY")
@@ -12,6 +12,7 @@ EBEST_APP_SECRET = os.environ.get("EBEST_APP_SECRET")
 EBEST_REST_URL = os.environ.get("EBEST_REST_URL", "https://openapi.ebestsec.co.kr:8080")
 EBEST_WS_URL = os.environ.get("EBEST_WS_URL", "wss://openapi.ebestsec.co.kr:29443")
 
+DELTA_SERVICE = os.environ.get("DELTA_SERVICE", "")
 DELTA_VERBOSE = os.environ.get("DELTA_VERBOSE", "False").lower() == "true"
 DELTA_ZMQ_TIMEOUT = int(os.environ.get("DELTA_ZMQ_TIMEOUT", "600"))
 DELTA_DB_PATH = os.environ.get("DELTA_DB_PATH", "~/deltadb")

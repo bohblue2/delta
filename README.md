@@ -1,6 +1,29 @@
 # delta
 Data-driven Evaluation and Live Trading Algorithm
 
+# Docker compose guide
+1. Build docker images
+```bash
+ docker build -f .docker/delta.dockerfile -t delta
+:latest .
+```
+
+2. Check docker compose configuration
+```bash
+docker compose \
+--env-file .docker/.docker-compose.dev.env \
+--file .docker/docker-compose.dev.yml \
+config
+```
+
+3. Start docker compose
+```bash
+docker compose \
+--env-file .docker/.docker-compose.dev.env \
+--file .docker/docker-compose.dev.yml \
+up
+```
+
 # ETL Process configuration Guide
 1. Create Deployment configuration file
 ```bash
