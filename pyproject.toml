@@ -27,6 +27,7 @@ black = "^23.9.0"
 ruff = "^0.0.287"
 pre-commit = "^3.4.0"
 isort = "^5.12.0"
+poetry2conda = "^0.3.0"
 
 [[tool.poetry.source]]
 name = "PyPI"
@@ -35,6 +36,9 @@ priority = "primary"
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
+
+[tool.poetry2conda]
+name = "delta"
 
 [tool.isort]
 py_version = "311"
