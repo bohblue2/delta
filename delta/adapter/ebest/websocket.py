@@ -54,7 +54,6 @@ async def send_ping(ws, delay):
 
 
 async def subscribe_to_topics(ws, header, body, topics, delay_sec=0.05):
-    """Subscribe to topics through the websocket."""
     for topic in tqdm(topics):
         body["body"]["tr_cd"] = topic[0]
         body["body"]["tr_key"] = topic[1]
@@ -71,7 +70,6 @@ async def subscribe_to_topics(ws, header, body, topics, delay_sec=0.05):
 
 
 async def listen_for_messages(ws, publisher):
-    """Listen for incoming websocket messages."""
     while True:
         msg = await ws.receive()
         if msg.type in (WSMsgType.CLOSED, WSMsgType.ERROR):
@@ -93,7 +91,6 @@ async def handle_msg(msg, publisher):
             "local_timestamp": datetime.now().timestamp(),
         }
         # TODO: ADD DEBUG LOG
-        # print(data)
         asyncio.create_task(
             publisher.publish(
                 topic=f'{data["tr_cd"]} {data["tr_key"]}',
