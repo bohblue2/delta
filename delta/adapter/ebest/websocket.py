@@ -1,4 +1,5 @@
 import asyncio
+import os.path
 from datetime import datetime
 from itertools import product
 
@@ -8,12 +9,12 @@ from aiohttp import WSMsgType
 from tqdm import tqdm
 
 from delta.adapter.ebest.constant import SUBSCRIBE
-from delta.config import DELTA_FEEDER_PUB_URL
+from delta.config import DELTA_FEEDER_PUB_URL, DELTA_DB_PATH
 from delta.network.zmq import ZmqPublisher
 
 
 def create_topics(date):
-    symbols = pd.read_csv(f"~/deltadb/{date}/t8436.csv")
+    symbols = pd.read_csv(os.path.join(DELTA_DB_PATH, date, "t8436.csv"))
     kospi_symbols = symbols[symbols["gubun"] == 1]["shcode"]
     kosdaq_symbols = symbols[symbols["gubun"] == 2]["shcode"]
 
@@ -65,6 +66,7 @@ async def subscribe_to_topics(ws, header, body, topics, delay_sec=0.05):
                 raise Exception(
                     f"Subscribe Error on ebest: {data['header']['rsp_msg']}",
                 )
+
         await asyncio.sleep(delay_sec)
 
 
@@ -90,6 +92,8 @@ async def handle_msg(msg, publisher):
             **data["body"],
             "local_timestamp": datetime.now().timestamp(),
         }
+        # TODO: ADD DEBUG LOG
+        # print(data)
         asyncio.create_task(
             publisher.publish(
                 topic=f'{data["tr_cd"]} {data["tr_key"]}',
@@ -105,7 +109,7 @@ async def start_client(sess, access_token, topics, url="/websocket"):
     try:
         async with sess.ws_connect(url) as ws:
             asyncio.create_task(send_ping(ws, 5))
-            await subscribe_to_topics(ws, header, body, topics)
+            await subscribe_to_topics(ws, header, body, topics[:100])
             await listen_for_messages(ws, publisher)
     except Exception as e:
         raise e

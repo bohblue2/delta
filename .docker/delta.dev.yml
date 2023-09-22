@@ -1,0 +1,33 @@
+version: "3.8"
+services:
+  delta_broker:
+    container_name: delta_broker
+    image: delta-broker:latest
+    restart: unless-stopped
+    networks:
+      - delta_backbone
+    ports:
+      - "25555:25555"
+      - "25556:25556"
+    env_file:
+      - ../.dev.env
+    volumes:
+      - ${DELTA_DB_PATH}:/deltadb
+      - "/tmp:/tmp" # TODO: Refactor me
+
+  delta_ebest_feeder:
+    container_name: delta_ebest_feeder
+    image: delta-ebest-feeder:latest
+    restart: unless-stopped
+    networks:
+      - delta_backbone
+    env_file:
+      - ../.dev.env
+    volumes:
+      - ${DELTA_DB_PATH}:/deltadb
+      - "/tmp:/tmp" # TODO: Refactor me
+
+networks:
+  delta_backbone:
+    driver: bridge
+    name: delta_backbone

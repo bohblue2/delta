@@ -76,6 +76,7 @@ def main():
 
     config = create_config()
     date = datetime.now().strftime("%Y%m%d")
+    os.makedirs(os.path.join(DELTA_DB_PATH, date), exist_ok=True)
     loggers = create_logger_config(["ebest", "crypto"], date, path=DELTA_DB_PATH)
 
     context = zmq.Context()

@@ -1,3 +1,4 @@
+import asyncio
 from datetime import datetime
 
 from aiohttp import ClientSession
@@ -24,3 +25,7 @@ async def main():
         raise_for_status=True,
     ) as sess:
         await start_client(sess, access_token, topics)
+
+
+if __name__ == "__main__":
+    asyncio.run(main())

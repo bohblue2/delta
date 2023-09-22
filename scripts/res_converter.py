@@ -1,13 +1,12 @@
+import argparse
+import os
 import sys
+from collections import OrderedDict
+from collections import defaultdict
+from datetime import datetime
+from typing import List
 
 import clipboard
-import os
-import click
-
-from datetime import datetime
-from collections import defaultdict
-from collections import OrderedDict
-from typing import List
 
 
 def readline_until_not_empty(f):
@@ -349,17 +348,6 @@ import msgspec
     clipboard.copy(statement)
 
 
-@click.command()
-@click.argument(
-    "task",
-    type=click.Choice(
-        [
-            "create_pydantic_model",
-            "create_msgspec_model_for_websocket",
-        ],
-    ),
-)
-@click.option("--path", default="./res", help="The default xing api res file path.")
 def cli(task, path):
     res_file_paths = list(
         map(
@@ -399,4 +387,25 @@ def cli(task, path):
 
 
 if __name__ == "__main__":
-    cli()
+    parser = argparse.ArgumentParser(description="CLI Tool")
+
+    # Choices for the task argument
+    choices = [
+        "create_pydantic_model",
+        "create_msgspec_model_for_websocket",
+    ]
+
+    parser.add_argument(
+        "task",
+        choices=choices,
+        help="Task to perform.",
+    )
+
+    parser.add_argument(
+        "--path",
+        default="./res",
+        help="The default xing api res file path.",
+    )
+
+    args = parser.parse_args()
+    cli(args.task, args.path)

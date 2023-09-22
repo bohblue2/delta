@@ -40,10 +40,9 @@ RUN poetry run python build.py
 
 FROM python-base as application
 # copy in our built poetry + venv
+WORKDIR $PYSETUP_PATH
 COPY --from=builder-base $POETRY_HOME $POETRY_HOME
 COPY --from=builder-base $PYSETUP_PATH $PYSETUP_PATH
+COPY --from=builder-base /usr/bin /usr/bin
+COPY --from=builder-base /usr/local/bin /usr/local/bin
 COPY --from=builder-base /usr/local/lib/python3.11/site-packages /usr/local/lib/python3.11/site-packages
-
-# Run Application
-WORKDIR $PYSETUP_PATH
-CMD poetry run python -m delta

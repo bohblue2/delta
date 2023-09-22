@@ -4,7 +4,7 @@ from os.path import join, dirname
 from dotenv import load_dotenv
 
 dotenv_filename = ".dev.env" if os.getenv("ENV", "DEV") else ".prod.env"
-dotenv_path = join("..", dirname(__file__), dotenv_filename)
+dotenv_path = join(dirname(__file__), "..", dotenv_filename)
 load_dotenv(dotenv_path)
 
 EBEST_APP_KEY = os.environ.get("EBEST_APP_KEY")

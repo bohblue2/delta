@@ -1,4 +1,5 @@
 import argparse
+import asyncio
 
 from delta.config import DELTA_SERVICE
 from delta.entrypoints.delta_message_broker import main as run_broker
@@ -22,7 +23,7 @@ def main():
     if args.service == "broker":
         run_broker()
     elif args.service == "ebest":
-        run_ebest()
+        asyncio.run(run_ebest())
     else:
         raise ValueError(f"Unknown service: {args.service}")
 
