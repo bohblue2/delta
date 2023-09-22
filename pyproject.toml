@@ -19,7 +19,6 @@ cython = "^3.0.2"
 loguru = "^0.7.2"
 pandas = "^2.1.1"
 orjson = "3.9.6"
-poetry2conda = {git = "https://github.com/bohblue2/poetry2conda.git"}
 
 [tool.poetry.group.dev.dependencies]
 clipboard = "^0.0.4"
@@ -27,6 +26,7 @@ black = "^23.9.0"
 ruff = "^0.0.287"
 pre-commit = "^3.4.0"
 isort = "^5.12.0"
+poetry2conda = {git = "https://github.com/bohblue2/poetry2conda.git", tag = "v0.3.0"}
 
 [[tool.poetry.source]]
 name = "PyPI"
@@ -44,11 +44,6 @@ name = "delta"
 # For example, tables and pytables, docker and docker-py.
 # To change the name when converting to a conda environment file, you can set it as:
 docker = { name = "docker-py" }
-clipboard = { channel = "conda-forge", version = "0.0.4" }
-black = { channel = "conda-forge", version = "^23.9.0" }
-ruff = { channel = "conda-forge", version = "^0.0.287" }
-pre-commit = { channel = "conda-forge", version = "^3.4.0" }
-isort = { channel = "conda-forge", version = "^5.12.0" }
 
 [tool.isort]
 py_version = "311"
