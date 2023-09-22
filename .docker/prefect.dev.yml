@@ -1,0 +1,72 @@
+version: "3.9"
+services:
+  database:
+    container_name: prefect-database
+    image: postgres:15.2-alpine
+    restart: always
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=postgres
+      - POSTGRES_DB=prefect
+    expose:
+      - 5432
+    volumes:
+      - db:/var/lib/postgresql/data
+    profiles: ["server"]
+
+  minio:
+    container_name: prefect-minio
+    image: minio/minio:latest
+    entrypoint: ["minio", "server", "--address", "0.0.0.0:9000", "--console-address", "0.0.0.0:9001", "/data"]
+    volumes:
+      - "minio:/data"
+    ports:
+      - 9000:9000
+      - 9001:9001
+    profiles: ["minio"]
+
+  server:
+    container_name: prefect-server
+    image: prefecthq/prefect:2.13.0-python3.11
+    restart: always
+    volumes:
+      - prefect:/root/.prefect
+    entrypoint: ["/opt/prefect/entrypoint.sh", "prefect", "server", "start"]
+    environment:
+      - PREFECT_UI_URL=http://0.0.0.0:4200/api
+      - PREFECT_API_URL=http://0.0.0.0:4200/api
+      - PREFECT_SERVER_API_HOST=0.0.0.0
+      - PREFECT_API_DATABASE_CONNECTION_URL=postgresql+asyncpg://postgres:postgres@database:5432/prefect
+    ports:
+      - 4200:4200
+    depends_on:
+      - database
+    profiles: ["server"]
+
+  agent:
+    container_name: prefect-agent
+    image: delta:latest
+    restart: always
+    entrypoint: ["/usr/local/bin/prefect", "worker", "start", "--pool", "delta-worker-pool", "--type", "process"]
+    environment:
+      - PREFECT_API_URL=http://server:4200/api
+    env_file:
+      - ../.dev.env
+    volumes:
+      - ${DELTA_DB_PATH}:/deltadb
+    profiles: ["agent"]
+
+  cli:
+    image: delta:latest
+    entrypoint: "bash"
+    environment:
+      - PREFECT_API_URL=http://server:4200/api
+    profiles: [ "cli" ]
+
+volumes:
+  prefect:
+  db:
+  minio:
+networks:
+  default:
+    name: prefect-network

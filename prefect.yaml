@@ -3,34 +3,30 @@
 # control along with your flow code.
 
 # Generic metadata about this project
-name: delta
+name: pysetup
 prefect-version: 2.13.0
 
 # build section allows you to manage and build docker images
-build:
+build: null
 
 # push section allows you to manage if and how this project is uploaded to remote locations
-push:
+push: null
 
 # pull section allows you to provide instructions for cloning this project in remote locations
 pull:
-- prefect.deployments.steps.git_clone:
-    repository: https://github.com/bohblue2/delta
-    branch: main
+  - prefect.deployments.steps.set_working_directory:
+      directory: /opt/pysetup
 
 # the deployments section allows you to provide configuration for deploying flows
 deployments:
-- name: daily
-  version:
-  tags: []
-  description:
-  entrypoint: delta/etl/flow/ebest.py:main
-  parameters: {}
-  work_pool:
-    name: delta-process-pool
-    work_queue_name:
-    job_variables: {}
-  schedule:
-    cron: 20 22 * * *
-    timezone: UTC
-    day_or: true
+  - name: daily
+    version: null
+    tags: []
+    description: null
+    entrypoint: delta/etl/ebest/update_master.py:main
+    parameters: {}
+    work_pool:
+      name: delta-worker-pool
+      work_queue_name: null
+      job_variables: {}
+    schedule: null

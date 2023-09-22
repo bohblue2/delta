@@ -3,7 +3,7 @@ import os
 import zmq
 from loguru import logger
 
-from delta.broker import ZmqClient, ZmqBroker
+from delta.services.broker import ZmqClient, ZmqBroker
 from delta.config import (
     DELTA_BROKER_EBEST_INTERNAL_PUB_URL,
     DELTA_BROKER_EBEST_EXTERNAL_PUB_URL,
@@ -13,10 +13,11 @@ from delta.config import (
     DELTA_BROKER_CRYPTO_SUB_URL,
     DELTA_VERBOSE,
     DELTA_ZMQ_TIMEOUT,
+    DELTA_DB_PATH,
 )
 
 
-def configure_logger(task_name, date, path="~/deltadb/"):
+def configure_logger(task_name, date, path):
     logger.add(
         os.path.join(path, date, f"logs/{task_name}_ticks.log"),
         format="{message}",
@@ -27,8 +28,8 @@ def configure_logger(task_name, date, path="~/deltadb/"):
     return logger.bind(task=task_name)
 
 
-def create_logger_config(task_names, date):
-    return {task: configure_logger(task, date) for task in task_names}
+def create_logger_config(task_names, date, path):
+    return {task: configure_logger(task, date, path) for task in task_names}
 
 
 def create_client(config, context):
@@ -59,11 +60,11 @@ def create_config():
     }
 
 
-def run_broker(clients, broker):
+def start_broker(clients, broker):
     try:
         while True:
             broker.proxy()
-    except KeyboardInterrupt:
+    except KeyboardInterrupt:  # TODO: Use signal handler.
         print("Closing.")
         for client in clients:
             client.close()
@@ -75,7 +76,8 @@ def main():
 
     config = create_config()
     date = datetime.now().strftime("%Y%m%d")
-    loggers = create_logger_config(["ebest", "crypto"], date)
+    os.makedirs(os.path.join(DELTA_DB_PATH, date), exist_ok=True)
+    loggers = create_logger_config(["ebest", "crypto"], date, path=DELTA_DB_PATH)
 
     context = zmq.Context()
     stock_client = create_client(config["ebest_config"], context)
@@ -86,8 +88,4 @@ def main():
     broker.add_handler(stock_client, loggers["ebest"].info)
     broker.add_handler(crypto_client, loggers["crypto"].info)
 
-    run_broker(clients, broker)
-
-
-if __name__ == "__main__":
-    main()
+    start_broker(clients, broker)

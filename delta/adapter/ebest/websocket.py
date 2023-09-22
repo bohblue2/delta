@@ -1,26 +1,20 @@
 import asyncio
+import os.path
 from datetime import datetime
 from itertools import product
 
-import pandas as pd
-from aiohttp import ClientSession, WSMsgType
-from httpx import Client
 import orjson as json
+import pandas as pd
+from aiohttp import WSMsgType
 from tqdm import tqdm
 
-from delta.adapter.ebest.auth import get_access_token
-from delta.config import (
-    EBEST_REST_URL,
-    EBEST_APP_KEY,
-    EBEST_APP_SECRET,
-    EBEST_WS_URL,
-    DELTA_FEEDER_PUB_URL,
-)
+from delta.adapter.ebest.constant import SUBSCRIBE
+from delta.config import DELTA_FEEDER_PUB_URL, DELTA_DB_PATH
 from delta.network.zmq import ZmqPublisher
 
 
 def create_topics(date):
-    symbols = pd.read_csv(f"~/deltadb/{date}/t8436.csv")
+    symbols = pd.read_csv(os.path.join(DELTA_DB_PATH, date, "t8436.csv"))
     kospi_symbols = symbols[symbols["gubun"] == 1]["shcode"]
     kosdaq_symbols = symbols[symbols["gubun"] == 2]["shcode"]
 
@@ -72,6 +66,7 @@ async def subscribe_to_topics(ws, header, body, topics, delay_sec=0.05):
                 raise Exception(
                     f"Subscribe Error on ebest: {data['header']['rsp_msg']}",
                 )
+
         await asyncio.sleep(delay_sec)
 
 
@@ -97,42 +92,24 @@ async def handle_msg(msg, publisher):
             **data["body"],
             "local_timestamp": datetime.now().timestamp(),
         }
-        await publisher.publish(
-            topic=f'{data["tr_cd"]} {data["tr_key"]}',
-            msg=json.dumps(data),
+        # TODO: ADD DEBUG LOG
+        # print(data)
+        asyncio.create_task(
+            publisher.publish(
+                topic=f'{data["tr_cd"]} {data["tr_key"]}',
+                msg=json.dumps(data),
+            ),
         )
 
 
 async def start_client(sess, access_token, topics, url="/websocket"):
-    header = {"header": {"token": access_token, "tr_type": "3"}}
+    header = {"header": {"token": access_token, "tr_type": SUBSCRIBE}}
     body = {"body": {"tr_cd": None, "tr_key": None}}
     publisher = ZmqPublisher(endpoint=DELTA_FEEDER_PUB_URL)
     try:
         async with sess.ws_connect(url) as ws:
             asyncio.create_task(send_ping(ws, 5))
-            await subscribe_to_topics(ws, header, body, topics[:20])
+            await subscribe_to_topics(ws, header, body, topics[:100])
             await listen_for_messages(ws, publisher)
     except Exception as e:
         raise e
-
-
-async def main():
-    with Client(verify=False, base_url=EBEST_REST_URL) as client:
-        access_token = get_access_token(
-            client,
-            app_key=EBEST_APP_KEY,
-            app_secret=EBEST_APP_SECRET,
-        )
-
-    topics = create_topics(date=datetime.now().strftime("%Y%m%d"))
-
-    async with ClientSession(
-        base_url=EBEST_WS_URL,
-        read_bufsize=2**16,
-        raise_for_status=True,
-    ) as sess:
-        await start_client(sess, access_token, topics)
-
-
-if __name__ == "__main__":
-    asyncio.run(main())

@@ -100,7 +100,7 @@ def _build_distribution(extensions: List[Extension]) -> Distribution:
 
     distribution = Distribution(
         dict(
-            name="nautilus_trader",
+            name="delta",
             ext_modules=cythonize(
                 module_list=extensions,
                 compiler_directives=CYTHON_COMPILER_DIRECTIVES,
