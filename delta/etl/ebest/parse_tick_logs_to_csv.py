@@ -2,6 +2,7 @@ import os
 from collections import defaultdict
 from datetime import datetime
 import orjson as json
+import codecs
 from glob import glob
 import pandas as pd
 from prefect import flow, task
@@ -14,15 +15,21 @@ def get_date_str():
 
 def get_log_paths(date):
     logs_path = os.path.join(DELTA_DB_PATH, date, "logs", "ebest_ticks.*.log")
+    print(logs_path)
     return glob(logs_path)
 
 
 def parse_lines(lines):
     table = defaultdict(list)
     for line in lines:
-        topic, _, data = line.split(b" ")
-        topic = topic[2:].decode("utf-8")
-        table[topic].append(json.loads(data[:-2]))
+        assert line[:2] == b"b'" and line[-2:] == b"'\n"
+        line = line[2:-2]
+        topic, symbol, data = line.split(b" ", 2)
+
+        topic = topic.decode("utf-8")
+        data = codecs.escape_decode(data)[0]
+
+        table[topic].append(json.loads(data))
     return table
 
 
@@ -37,9 +44,10 @@ def save_to_csv(table, date):
         df.to_csv(path, index=False, mode=mode, header=header)
 
 
-@task(timeout_seconds=60, log_prints=True)
+@task(log_prints=True)
 def process_logs(date, paths):
     for path in paths:
+        print(f"{path} is processing...")
         with open(path, "rb") as io:
             lines = io.readlines()
         table = parse_lines(lines)

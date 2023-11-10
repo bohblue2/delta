@@ -171,3 +171,6 @@ scripts/res
 
 # Cenfidential files
 *.env
+
+# Temporary disabled
+notebooks/

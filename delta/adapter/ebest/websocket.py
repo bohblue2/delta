@@ -18,6 +18,7 @@ def create_topics(date):
     kospi_symbols = symbols[symbols["gubun"] == 1]["shcode"]
     kosdaq_symbols = symbols[symbols["gubun"] == 2]["shcode"]
 
+    # TODO: move to constant.py
     kospi_tr_cd = [
         "DH1",  # after hour single price orderbook
         "DS3",  # after hour single price conclusion
